@@ -31,6 +31,15 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen()),
+            );
+          },
+        ),
         actions: [
           IconButton(
             icon: Icon(

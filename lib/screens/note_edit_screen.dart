@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/model/notes_model.dart';
+import 'package:flutter_application_1/screens/note_details_screen.dart';
 import 'package:flutter_application_1/services/firestore_service.dart';
+import 'package:flutter_application_1/theme/app_theme.dart';
 
 class NoteEditScreen extends StatefulWidget {
   final Note note;
@@ -52,13 +54,20 @@ class _NoteEditScreenState extends State<NoteEditScreen> {
       });
 
       try {
-        final _updatedNote = widget.note.copyWith(
+        final updatedNote = widget.note.copyWith(
           title: _titleController.text,
           content: _contentController.text,
+          colorIndex: _selectedColorIndex,
           tags: _tags,
         );
+        await _firestoreService.updateNote(updatedNote);
         if (mounted) {
-          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NoteDetailsScreen(note: updatedNote),
+            ),
+          );
         }
       } catch (e) {
         ScaffoldMessenger.of(
@@ -74,6 +83,98 @@ class _NoteEditScreenState extends State<NoteEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
+      appBar: AppBar(
+        title: const Text('Edit Note'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: _isLoading ? null : _saveNote,
+          ),
+        ],
+      ),
+      body:
+          _isLoading
+              ? Center(
+                child: CircularProgressIndicator(color: AppTheme.primaryColor),
+              )
+              : SingleChildScrollView(
+                padding: EdgeInsets.all(16),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextFormField(
+                        controller: _titleController,
+                        decoration: const InputDecoration(
+                          labelText: 'Title',
+                          border: InputBorder.none,
+                          filled: true,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a title';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 16),
+
+                      TextFormField(
+                        controller: _contentController,
+                        decoration: const InputDecoration(
+                          labelText: 'Content',
+                          border: InputBorder.none,
+                          filled: true,
+                        ),
+                        maxLines: 5,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a content';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 16),
+                      if (_tags.isNotEmpty)
+                        Wrap(
+                          spacing: 8.0,
+                          children:
+                              _tags.map((tag) {
+                                return Chip(
+                                  label: Text(tag),
+                                  deleteIcon: Icon(Icons.close, size: 18),
+                                  onDeleted: () => _removeTag(tag),
+                                );
+                              }).toList(),
+                        ),
+                      TextFormField(
+                        controller: _tagController,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          labelText: 'Add Tags',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a content';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _contentController.dispose();
+    _tagController.dispose();
+    super.dispose();
   }
 }

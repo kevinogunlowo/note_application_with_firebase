@@ -66,7 +66,7 @@ class NoteCard extends StatelessWidget {
           },
           borderRadius: BorderRadius.circular(12),
           child: Padding(
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.all(isListView ? 10 : 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -76,7 +76,7 @@ class NoteCard extends StatelessWidget {
                       child: Text(
                         note.title,
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: isListView ? 16 : 18,
                           fontWeight: FontWeight.bold,
                         ),
                         maxLines: 1,
@@ -87,6 +87,15 @@ class NoteCard extends StatelessWidget {
                       Icon(Icons.push_pin, color: Colors.amberAccent, size: 18),
                   ],
                 ),
+                if (!isListView) ...[
+                  SizedBox(height: 4),
+                  Text(
+                    note.content,
+                    style: TextStyle(fontSize: 14, color: Colors.blueGrey[700]),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
                 Text(
                   note.content,
                   style: TextStyle(fontSize: 14, color: Colors.blueGrey[700]),

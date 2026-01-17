@@ -4,6 +4,7 @@ import 'package:flutter_application_1/model/notes_model.dart';
 import 'package:flutter_application_1/screens/add_note_screen.dart';
 import 'package:flutter_application_1/services/firestore_service.dart';
 import 'package:flutter_application_1/theme/app_theme.dart';
+import 'package:flutter_application_1/widgets/ai_chat_bottom_sheet.dart';
 import 'package:flutter_application_1/widgets/note_card.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -87,6 +88,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                   IconButton(
+                    icon: const Icon(
+                      Icons.psychology,
+                      color: Colors.blueAccent,
+                    ),
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (context) => AIChatBottomSheet(),
+                      );
+                    },
+                  ),
+                  IconButton(
                     icon: Icon(
                       _viewMode == AppConstants.gridViewMode
                           ? Icons.view_list
@@ -166,6 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
         itemBuilder: (context, index) {
           return NoteCard(
             note: notes[index],
+            isListView: false,
             onDelete: () async {
               await _firestoreService.deleteNote(notes[index].id);
               ScaffoldMessenger.of(context).showSnackBar(
@@ -178,7 +193,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 SnackBar(content: Text('Note Pin Status Updated')),
               );
             },
-            isListView: true,
           );
         },
       ),
